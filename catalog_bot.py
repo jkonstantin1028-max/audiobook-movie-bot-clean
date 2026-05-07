@@ -71,11 +71,10 @@ async def send_chapter(callback: types.CallbackQuery):
         [InlineKeyboardButton(text="⬅️ К списку глав", callback_data="back_to_chapters")],
         [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
-    await callback.message.answer(reply_markup=keyboard)
+    await callback.message.answer("", reply_markup=keyboard)
 
 @dp.callback_query(lambda c: c.data == "back_to_chapters")
 async def back_to_chapters(callback: types.CallbackQuery):
-    # возвращаемся к списку книг
     await show_books(callback)
 
 # --- Фильмы ---
@@ -101,7 +100,7 @@ async def send_movie(callback: types.CallbackQuery):
         [InlineKeyboardButton(text="⬅️ К списку фильмов", callback_data="back_to_movies")],
         [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
-    await callback.message.answer(reply_markup=keyboard)
+    await callback.message.answer("", reply_markup=keyboard)
 
 @dp.callback_query(lambda c: c.data == "back_to_movies")
 async def back_to_movies(callback: types.CallbackQuery):
@@ -119,6 +118,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
