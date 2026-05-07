@@ -18,15 +18,7 @@ books = {
 }
 
 movies = {
-    "Фильм 1": 7,
-    "Фильм 2": 8,
-    "Фильм 3": 9,
-    "Фильм 4": 10,
-    "Фильм 5": 11,
-    "Фильм 6": 12,
-    "Фильм 7": 13,
-    "Фильм 8": 14,
-    "Фильм 9": 15
+    "Фильмы пачка 1": (7, 15)
 }
 
 # --- Главное меню ---
@@ -44,7 +36,7 @@ async def start_command(message: types.Message):
 # --- Перезапуск ---
 @dp.callback_query(lambda c: c.data == "restart")
 async def restart_bot(callback: types.CallbackQuery):
-    await callback.message.delete()  # удаляем старое сообщение
+    await callback.message.delete()
     await callback.message.answer("🔄 Бот перезапущен!", reply_markup=main_menu())
 
 # --- Книги ---
@@ -54,8 +46,7 @@ async def show_books(callback: types.CallbackQuery):
         [InlineKeyboardButton(text=title, callback_data=f"book_{title}")]
         for title in books.keys()
     ] + [
-        [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
-        [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
     await callback.message.answer("📖 Выберите книгу:", reply_markup=keyboard)
 
@@ -67,8 +58,7 @@ async def show_chapters(callback: types.CallbackQuery):
         [InlineKeyboardButton(text=f"Глава {i}", callback_data=f"chapter_{msg_id}")]
         for i, msg_id in enumerate(range(start_id+1, end_id+1), start=1)
     ] + [
-        [InlineKeyboardButton(text="⬅️ Назад", callback_data="books")],
-        [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
     await callback.message.answer(f"📖 {title}\nВыберите главу:", reply_markup=keyboard)
 
@@ -78,18 +68,41 @@ async def send_chapter(callback: types.CallbackQuery):
     await bot.forward_message(chat_id=callback.message.chat.id,
                               from_chat_id=BOOKS_CHAT_ID,
                               message_id=msg_id)
+    # кнопки возврата
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ К списку глав", callback_data="back_to_chapters")],
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
+    ])
+    await callback.message.answer("Что дальше?", reply_markup=keyboard)
+
+@dp.callback_query(lambda c: c.data == "back_to_chapters")
+async def back_to_chapters(callback: types.CallbackQuery):
+    # возвращаемся к списку глав последней книги
+    # для простоты можно хранить текущую книгу в FSM, но здесь пример статический
+    await show_books(callback)
 
 # --- Фильмы ---
 @dp.callback_query(lambda c: c.data == "movies")
 async def show_movies(callback: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=title, callback_data=f"movie_{msg_id}")]
-        for title, msg_id in movies.items()
+        [InlineKeyboardButton(text=title, callback_data=f"moviepack_{title}")]
+        for title in movies.keys()
     ] + [
-        [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
-        [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
-    await callback.message.answer("🎬 Выберите фильм:", reply_markup=keyboard)
+    await callback.message.answer("🎬 Выберите фильм или пачку:", reply_markup=keyboard)
+
+@dp.callback_query(lambda c: c.data.startswith("moviepack_"))
+async def show_movie_pack(callback: types.CallbackQuery):
+    title = callback.data.replace("moviepack_", "")
+    start_id, end_id = movies[title]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=f"Фильм {i}", callback_data=f"movie_{msg_id}")]
+        for i, msg_id in enumerate(range(start_id, end_id+1), start=1)
+    ] + [
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
+    ])
+    await callback.message.answer(f"🎬 {title}\nВыберите фильм:", reply_markup=keyboard)
 
 @dp.callback_query(lambda c: c.data.startswith("movie_"))
 async def send_movie(callback: types.CallbackQuery):
@@ -97,12 +110,18 @@ async def send_movie(callback: types.CallbackQuery):
     await bot.copy_message(chat_id=callback.message.chat.id,
                            from_chat_id=MOVIES_CHAT_ID,
                            message_id=msg_id)
+    # кнопки возврата
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ К списку фильмов", callback_data="back_to_movies")],
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
+    ])
+    await callback.message.answer("Что дальше?", reply_markup=keyboard)
+
+@dp.callback_query(lambda c: c.data == "back_to_movies")
+async def back_to_movies(callback: types.CallbackQuery):
+    await show_movies(callback)
 
 # --- Навигация ---
-@dp.callback_query(lambda c: c.data == "back")
-async def go_back(callback: types.CallbackQuery):
-    await callback.message.answer("📚 Выберите категорию:", reply_markup=main_menu())
-
 @dp.callback_query(lambda c: c.data == "home")
 async def go_home(callback: types.CallbackQuery):
     await callback.message.answer("🏠 Главное меню:", reply_markup=main_menu())
@@ -114,6 +133,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
