@@ -1,5 +1,5 @@
 
-import asyncio, json
+import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -11,10 +11,18 @@ MOVIES_CHAT_ID = -1003980018063
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Загружаем книги из JSON
-with open("books.json", "r", encoding="utf-8") as f:
-    books = json.load(f)
+# --- Конфигурация ---
+books = {
+    "Дневник леди Евы": (101, 124),
+    "Вторая книга": (201, 210)
+}
 
+movies = {
+    "Фильм 1": 301,
+    "Фильм 2": 302
+}
+
+# --- Главное меню ---
 def main_menu():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📖 Аудиокниги", callback_data="books")],
@@ -41,10 +49,10 @@ async def show_books(callback: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data.startswith("book_"))
 async def show_chapters(callback: types.CallbackQuery):
     title = callback.data.replace("book_", "")
-    chapters = books[title]["chapters"]
+    start_id, end_id = books[title]
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=f"Глава {i+1}", callback_data=f"chapter_{msg_id}")]
-        for i, msg_id in enumerate(chapters)
+        [InlineKeyboardButton(text=f"Глава {i}", callback_data=f"chapter_{msg_id}")]
+        for i, msg_id in enumerate(range(start_id+1, end_id+1), start=1)
     ] + [
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="books")],
         [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
@@ -58,12 +66,13 @@ async def send_chapter(callback: types.CallbackQuery):
                               from_chat_id=BOOKS_CHAT_ID,
                               message_id=msg_id)
 
-# --- Фильмы (пока заглушки, можно сделать аналогичный movies.json) ---
+# --- Фильмы ---
 @dp.callback_query(lambda c: c.data == "movies")
 async def show_movies(callback: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Фильм 1", callback_data="movie_301")],
-        [InlineKeyboardButton(text="🎬 Фильм 2", callback_data="movie_302")],
+        [InlineKeyboardButton(text=title, callback_data=f"movie_{msg_id}")]
+        for title, msg_id in movies.items()
+    ] + [
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
         [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
     ])
@@ -87,11 +96,12 @@ async def go_home(callback: types.CallbackQuery):
 
 # --- Запуск ---
 async def main():
-    print("✅ Бот запущен, ждём команды...")
+    print("✅ Бот запущен")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
