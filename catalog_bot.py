@@ -3,7 +3,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from telethon import TelegramClient, events
+from telethon import TelegramClient
 import os
 
 # --- Конфигурация ---
@@ -31,7 +31,7 @@ def main_menu():
 
 @dp.message(Command("start"))
 async def start_command(message: types.Message):
-    await message.answer("📚 Выберите категорию:", reply_markup=main_menu())
+    await message.answer("🏠 Главное меню:", reply_markup=main_menu())
 
 @dp.message(Command("menu"))
 async def show_menu(message: types.Message):
@@ -135,8 +135,7 @@ async def go_home(callback: types.CallbackQuery):
 
 # --- Запуск ---
 async def main():
-    # Авторизация через токен бота
-    await client.start(bot_token=BOT_TOKEN)
+    await client.start(bot_token=BOT_TOKEN)  # Авторизация через токен
     print("Бот запущен, ждём команды...")
     await dp.start_polling(bot)
 
