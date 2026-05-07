@@ -135,10 +135,12 @@ async def go_home(callback: types.CallbackQuery):
 
 # --- Запуск ---
 async def main():
-    await client.start(bot_token=BOT_TOKEN)  # Авторизация через токен
+    # Telethon только для чтения storage-чатов
+    await client.connect()
     print("Бот запущен, ждём команды...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
