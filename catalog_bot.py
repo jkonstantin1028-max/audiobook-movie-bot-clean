@@ -11,7 +11,7 @@ MOVIES_CHAT_ID = -1003980018063
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Загружаем книги
+# Загружаем книги из JSON
 with open("books.json", "r", encoding="utf-8") as f:
     books = json.load(f)
 
@@ -58,7 +58,7 @@ async def send_chapter(callback: types.CallbackQuery):
                               from_chat_id=BOOKS_CHAT_ID,
                               message_id=msg_id)
 
-# --- Фильмы (аналогично, можно сделать movies.json) ---
+# --- Фильмы (пока заглушки, можно сделать аналогичный movies.json) ---
 @dp.callback_query(lambda c: c.data == "movies")
 async def show_movies(callback: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -92,6 +92,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
