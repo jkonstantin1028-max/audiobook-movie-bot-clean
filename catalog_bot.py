@@ -65,12 +65,12 @@ async def send_chapter(callback: types.CallbackQuery):
     await bot.forward_message(chat_id=callback.message.chat.id,
                               from_chat_id=BOOKS_CHAT_ID,
                               message_id=msg_id)
-    # сразу показываем кнопки возврата
+    # показываем кнопки возврата
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⬅️ К списку глав", callback_data="back_to_chapters")],
         [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
-    await callback.message.answer(" ", reply_markup=keyboard)
+    await callback.message.answer("Что дальше?", reply_markup=keyboard)
 
 @dp.callback_query(lambda c: c.data == "back_to_chapters")
 async def back_to_chapters(callback: types.CallbackQuery):
@@ -94,12 +94,12 @@ async def send_movie(callback: types.CallbackQuery):
     await bot.copy_message(chat_id=callback.message.chat.id,
                            from_chat_id=MOVIES_CHAT_ID,
                            message_id=msg_id)
-    # сразу показываем кнопки возврата
+    # показываем кнопки возврата
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⬅️ К списку фильмов", callback_data="back_to_movies")],
         [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
     ])
-    await callback.message.answer(" ", reply_markup=keyboard)
+    await callback.message.answer("Что дальше?", reply_markup=keyboard)
 
 @dp.callback_query(lambda c: c.data == "back_to_movies")
 async def back_to_movies(callback: types.CallbackQuery):
