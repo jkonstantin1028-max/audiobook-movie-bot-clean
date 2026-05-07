@@ -18,14 +18,14 @@ books = {
 }
 
 movies = {
-    "Фильм 1": 7
-    "Фильм 2": 8
-    "Фильм 3": 9
-    "Фильм 4": 10
-    "Фильм 5": 11
-    "Фильм 6": 12
-    "Фильм 7": 13
-    "Фильм 8": 14
+    "Фильм 1": 7,
+    "Фильм 2": 8,
+    "Фильм 3": 9,
+    "Фильм 4": 10,
+    "Фильм 5": 11,
+    "Фильм 6": 12,
+    "Фильм 7": 13,
+    "Фильм 8": 14,
     "Фильм 9": 15
 }
 
@@ -40,6 +40,12 @@ def main_menu():
 @dp.message(Command("start"))
 async def start_command(message: types.Message):
     await message.answer("🏠 Главное меню:", reply_markup=main_menu())
+
+# --- Перезапуск ---
+@dp.callback_query(lambda c: c.data == "restart")
+async def restart_bot(callback: types.CallbackQuery):
+    await callback.message.delete()  # удаляем старое сообщение
+    await callback.message.answer("🔄 Бот перезапущен!", reply_markup=main_menu())
 
 # --- Книги ---
 @dp.callback_query(lambda c: c.data == "books")
@@ -108,6 +114,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
