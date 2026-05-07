@@ -5,9 +5,9 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # --- Конфигурация ---
-BOT_TOKEN = "ТОКЕН_ТВОЕГО_БОТА"
-BOOKS_CHAT_ID = -1003979059214   # ID чата с аудиокнигами
-MOVIES_CHAT_ID = -1003980018063  # ID чата с фильмами
+BOT_TOKEN = "8793623384:AAH_Mh0b5xI7kEGKztlxgxnJmjBy9odjY8Q"
+BOOKS_CHAT_ID = -1003979059214
+MOVIES_CHAT_ID = -1003980018063
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -32,10 +32,9 @@ async def restart_bot(callback: types.CallbackQuery):
 # --- Аудиокниги ---
 @dp.callback_query(lambda c: c.data == "books")
 async def show_books(callback: types.CallbackQuery):
-    # Пример: показываем список книг (можно расширить)
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📚 Книга 1", callback_data="book_1")],
-        [InlineKeyboardButton(text="📚 Книга 2", callback_data="book_2")],
+        [InlineKeyboardButton(text="📚 Книга 1", callback_data="book_101")],
+        [InlineKeyboardButton(text="📚 Книга 2", callback_data="book_102")],
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
         [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
     ])
@@ -45,8 +44,8 @@ async def show_books(callback: types.CallbackQuery):
 async def show_chapters(callback: types.CallbackQuery):
     book_id = callback.data.replace("book_", "")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Глава 1", callback_data=f"chapter_{book_id}_101")],
-        [InlineKeyboardButton(text="Глава 2", callback_data=f"chapter_{book_id}_102")],
+        [InlineKeyboardButton(text="Глава 1", callback_data=f"chapter_{book_id}_201")],
+        [InlineKeyboardButton(text="Глава 2", callback_data=f"chapter_{book_id}_202")],
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="books")],
         [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
     ])
@@ -64,8 +63,8 @@ async def send_chapter(callback: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data == "movies")
 async def show_movies(callback: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Фильм 1", callback_data="movie_201")],
-        [InlineKeyboardButton(text="🎬 Фильм 2", callback_data="movie_202")],
+        [InlineKeyboardButton(text="🎬 Фильм 1", callback_data="movie_301")],
+        [InlineKeyboardButton(text="🎬 Фильм 2", callback_data="movie_302")],
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
         [InlineKeyboardButton(text="🏠 Домой", callback_data="home")]
     ])
