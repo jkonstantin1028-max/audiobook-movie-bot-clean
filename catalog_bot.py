@@ -1,7 +1,6 @@
 
-import asyncio
-from telethon import TelegramClient, events, Button
 import os
+from telethon import TelegramClient, events, Button
 
 API_ID = int(os.getenv("API_ID", 30394715))
 API_HASH = os.getenv("API_HASH", "81ee020c7e55609b24131f6e702237dd")
@@ -16,24 +15,21 @@ BOOKS = {}
 MOVIES = {}
 
 # --- Главное меню ---
+def main_menu():
+    return [
+        [Button.inline("📖 Аудиокниги", b"books")],
+        [Button.inline("🎬 Фильмы", b"movies")],
+        [Button.inline("🔄 Перезапуск", b"restart")]
+    ]
+
 @client.on(events.NewMessage(pattern="/start"))
 async def start(event):
-    await event.respond(
-        "🏠 Главное меню:",
-        buttons=[
-            [Button.inline("📖 Аудиокниги", b"books")],
-            [Button.inline("🎬 Фильмы", b"movies")],
-            [Button.inline("🔄 Перезапуск", b"restart")]
-        ]
-    )
+    await event.respond("🏠 Главное меню:", buttons=main_menu())
 
 # --- Перезапуск ---
 @client.on(events.CallbackQuery(data=b"restart"))
 async def restart(event):
-    await event.edit("🔄 Бот перезапущен!", buttons=[
-        [Button.inline("📖 Аудиокниги", b"books")],
-        [Button.inline("🎬 Фильмы", b"movies")]
-    ])
+    await event.respond("🔄 Бот перезапущен!", buttons=main_menu())
 
 # --- Аудиокниги ---
 @client.on(events.CallbackQuery(data=b"books"))
@@ -56,7 +52,7 @@ async def show_books(event):
         for key, data in BOOKS.items()
     ]
     buttons.append([Button.inline("⬅️ Назад", b"start")])
-    await event.edit("📖 Выберите книгу:", buttons=buttons)
+    await event.respond("📖 Выберите книгу:", buttons=buttons)
 
 @client.on(events.CallbackQuery(pattern=b"book_"))
 async def show_chapters(event):
@@ -69,7 +65,7 @@ async def show_chapters(event):
         for i, msg_id in enumerate(chapters)
     ]
     buttons.append([Button.inline("⬅️ Назад", b"books")])
-    await event.edit(f"📖 Книга: {book.get('title','')}\nВыберите главу:", buttons=buttons)
+    await event.respond(f"📖 Книга: {book.get('title','')}\nВыберите главу:", buttons=buttons)
 
 @client.on(events.CallbackQuery(pattern=b"chapter_"))
 async def send_chapter(event):
@@ -94,7 +90,7 @@ async def show_movies(event):
         for key, data in MOVIES.items()
     ]
     buttons.append([Button.inline("⬅️ Назад", b"start")])
-    await event.edit("🎬 Выберите фильм:", buttons=buttons)
+    await event.respond("🎬 Выберите фильм:", buttons=buttons)
 
 @client.on(events.CallbackQuery(pattern=b"movie_"))
 async def send_movie(event):
@@ -106,6 +102,7 @@ async def send_movie(event):
 
 print("✅ Бот запущен...")
 client.run_until_disconnected()
+
 
 
 
