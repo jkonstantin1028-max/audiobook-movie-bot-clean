@@ -62,23 +62,15 @@ async def show_chapters(callback: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data.startswith("chapter_"))
 async def send_chapter(callback: types.CallbackQuery):
     msg_id = int(callback.data.replace("chapter_", ""))
-
-    # ищем диапазон книги
-    for title, (start_id, end_id) in books.items():
-        if start_id < msg_id <= end_id:
-            # пересылаем все главы начиная с выбранной
-            for next_id in range(msg_id, end_id+1):
-                await bot.forward_message(chat_id=callback.message.chat.id,
-                                          from_chat_id=BOOKS_CHAT_ID,
-                                          message_id=next_id)
-
-            # после окончания книги показываем кнопки возврата
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="⬅️ К списку глав", callback_data="back_to_chapters")],
-                [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
-            ])
-            await callback.message.answer("────────────", reply_markup=keyboard)
-            break
+    await bot.forward_message(chat_id=callback.message.chat.id,
+                              from_chat_id=BOOKS_CHAT_ID,
+                              message_id=msg_id)
+    # показываем кнопки возврата
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ К списку глав", callback_data="back_to_chapters")],
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
+    ])
+    await callback.message.answer("────────────", reply_markup=keyboard)
 
 @dp.callback_query(lambda c: c.data == "back_to_chapters")
 async def back_to_chapters(callback: types.CallbackQuery):
@@ -102,6 +94,7 @@ async def send_movie(callback: types.CallbackQuery):
     await bot.copy_message(chat_id=callback.message.chat.id,
                            from_chat_id=MOVIES_CHAT_ID,
                            message_id=msg_id)
+    # показываем кнопки возврата
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⬅️ К списку фильмов", callback_data="back_to_movies")],
         [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
@@ -124,6 +117,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
