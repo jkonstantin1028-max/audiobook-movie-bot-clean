@@ -5,6 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 BOT_TOKEN = "8793623384:AAH_Mh0b5xI7kEGKztlxgxnJmjBy9odjY8Q"
 BOOKS_CHAT_ID = -1003979059214
+MOVIES_CHAT_ID = -1003980018063
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -15,10 +16,13 @@ books = {
     "Вторая книга": (125, 137)
 }
 
+movies_range = (7, 15)  # фильмы идут подряд
+
 # --- Главное меню ---
 def main_menu():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📖 Аудиокниги", callback_data="books")],
+        [InlineKeyboardButton(text="🎬 Фильмы", callback_data="movies")],
         [InlineKeyboardButton(text="🔄 Перезапуск", callback_data="restart")]
     ])
 
@@ -80,6 +84,34 @@ async def send_chapter(callback: types.CallbackQuery):
 async def back_to_chapters(callback: types.CallbackQuery):
     await show_books(callback)
 
+# --- Фильмы ---
+@dp.callback_query(lambda c: c.data == "movies")
+async def show_movies(callback: types.CallbackQuery):
+    start_id, end_id = movies_range
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=f"Фильм {i}", callback_data=f"movie_{msg_id}")]
+        for i, msg_id in enumerate(range(start_id, end_id+1), start=1)
+    ] + [
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
+    ])
+    await callback.message.answer("🎬 Выберите фильм:", reply_markup=keyboard)
+
+@dp.callback_query(lambda c: c.data.startswith("movie_"))
+async def send_movie(callback: types.CallbackQuery):
+    msg_id = int(callback.data.replace("movie_", ""))
+    await bot.copy_message(chat_id=callback.message.chat.id,
+                           from_chat_id=MOVIES_CHAT_ID,
+                           message_id=msg_id)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ К списку фильмов", callback_data="back_to_movies")],
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="home")]
+    ])
+    await callback.message.answer("**************", reply_markup=keyboard)
+
+@dp.callback_query(lambda c: c.data == "back_to_movies")
+async def back_to_movies(callback: types.CallbackQuery):
+    await show_movies(callback)
+
 # --- Навигация ---
 @dp.callback_query(lambda c: c.data == "home")
 async def go_home(callback: types.CallbackQuery):
@@ -92,6 +124,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
